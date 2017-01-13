@@ -88,8 +88,11 @@ public class PlayerPanel extends JPanel
 		
 		//Create the text fields
 		nameText = new JTextField();
-		cashText = new JTextField();
+		cashText = new JTextField("$100.00");
 		
+		//Set Text Color to a dark green
+		cashText.setDisabledTextColor(Color.decode("#228b22"));
+//		cashText.setDisabledTextColor(new Color(0x002c00));
 		cashText.setPreferredSize(new Dimension());
 		
 		//Make the cash field uneditable
@@ -164,14 +167,57 @@ public class PlayerPanel extends JPanel
 	}
 	
 	/**
-	 * Disables the radio buttons
+	 * Enables or Disables the radio buttons
+	 * 
+	 * @param trueOrFalse - Set True to enable radio buttons
+	 * 						 - Set False to disable radio buttons
+	 * 
+	 * Unused
 	 */
-	public void disableRadioButtons()
-	{
-		car1.setEnabled(false);
-		car2.setEnabled(false);
-		car3.setEnabled(false);
-		car4.setEnabled(false);
-		car5.setEnabled(false);
+	public void editRadioButtons(boolean trueOrFalse)
+	{	
+		car1.setEnabled(trueOrFalse);
+		car2.setEnabled(trueOrFalse);
+		car3.setEnabled(trueOrFalse);
+		car4.setEnabled(trueOrFalse);
+		car5.setEnabled(trueOrFalse);
+		
+//		btnPanel.setEnabled(trueOrFalse);
 	}
+	
+	public void editNameText(boolean trueOrFalse)
+	{
+		//Disable editing of nameText
+		nameText.setEnabled(trueOrFalse);
+		
+		//Set Text Color to black
+		nameText.setDisabledTextColor(Color.decode("#228b22"));
+	}
+
+	/**
+	 * @return the nameText
+	 */
+	public JTextField getNameText()
+	{
+		return nameText;
+	}
+
+	/**
+	 * @param nameText the nameText to set
+	 */
+	public void setNameText(JTextField nameText)
+	{
+		this.nameText = nameText;
+	}
+
+	/**
+	 * @param cashText the cashText to set
+	 */
+	public void setCashText(JTextField cashText)
+	{
+		this.cashText = cashText;
+	}
+	
+	
+
 }

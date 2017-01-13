@@ -36,4 +36,9 @@ public class Player
 	{
 		return vehicle;
 	}
+	
+	public String toString()
+	{
+		return vehicle.toString() + "\nCash: " + cash;
+	}
 }

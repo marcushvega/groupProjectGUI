@@ -27,7 +27,10 @@ public class Car
 	}
 	public double getTime()
 	{
-		time =( Math.random()*10) + 1;
+		if (model.equalsIgnoreCase("Yugo"))
+			time = (Math.random() * 10) + 15;
+		else
+			time =( Math.random()*10) + 1;
 		return time;
 	}
 
