@@ -10,10 +10,13 @@ import java.io.IOException;
 import java.net.*; //For URL and MalformedURLException classes
 						 //  For putting images / gif into panel
 import java.util.*;
+import java.applet.*; //For music
 
 public class RacingGUI extends JFrame
 {
 	private JFrame fireworksFrame;	  //Reference Fireworks window
+	
+	private JLabel winnerLabel;		  //Reference Winner message
 	
 	private Player player1;				  //Reference player 1
 	private Player player2;				  //Reference player 2
@@ -166,6 +169,7 @@ public class RacingGUI extends JFrame
 	{
 		public void actionPerformed(ActionEvent e)
 		{
+			//RACE!! button is clicked
 			if (e.getSource() == raceButton)
 			{
 				playerPanel1.editNameText(false);
@@ -180,25 +184,29 @@ public class RacingGUI extends JFrame
 				player2 = playerPanel2.getCarChoice();
 				
 				//Set player names
-				player1.setName(playerPanel1.getName());
-				player2.setName(playerPanel2.getName());
-				
-				System.out.println(player1);
-				System.out.println(player2);
+				player1.setName(playerPanel1.getNameText());
+				player2.setName(playerPanel2.getNameText());
 				
 				theFireworks();
 				
+				//Start playing music
+//				playMusic();
+				
 			}
+			//EXIT button is clicked
 			else if (e.getSource() == exitButton)
 			{
-				//.dispose();z
+				//Closes the application
 				System.exit(0);
 			}
+			//New Game button is clicked
 			else if (e.getSource() == newGameButton)
 			{
+				//Players, once again, are allowed to change their name
 				playerPanel1.editNameText(true);
 				playerPanel2.editNameText(true);
 			}
+			//Close button on fireworks screen is clicked
 			else if (e.getSource() == clFireworksButton)
 			{
 				//Remove window from view
@@ -207,9 +215,26 @@ public class RacingGUI extends JFrame
 				//Dispose window from memory
 				fireworksFrame.dispose();
 			}
-			else if (e.getSource() == betPanel1.getBet10())
+			//Either "Bet $10" button is clicked
+			else if (e.getSource() == betPanel1.getBet10()
+					|| e.getSource() == betPanel2.getBet10())
 			{
+				//Add $10.00 to the wager
 				addToWager(10);
+			}
+			//Either "Bet $50" button is clicked
+			else if (e.getSource() == betPanel1.getBet50() 
+					|| e.getSource() == betPanel2.getBet50())
+			{
+				//Add $50.00 to the wager
+				addToWager(50);
+			}
+			//Either "Bet $100" button is clicked
+			else if (e.getSource() == betPanel1.getBet100()
+					|| e.getSource() == betPanel2.getBet100())
+			{
+				//Add $100.00 to the wager
+				addToWager(100);
 			}
 		}
 	}
@@ -232,9 +257,13 @@ public class RacingGUI extends JFrame
 		clFireworksButton = new JButton("Close");
 		clFireworksButton.addActionListener(new ButtonListener());
 		
+		//Calculate the winner of the race
+		calcWinner();
+		
 		//Add components to frame
 		fireworksFrame.add(fireworks, BorderLayout.CENTER);
 		fireworksFrame.add(clFireworksButton, BorderLayout.SOUTH);
+		fireworksFrame.add(winnerLabel, BorderLayout.NORTH);
 		
 	   fireworksFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	   fireworksFrame.pack();
@@ -247,14 +276,16 @@ public class RacingGUI extends JFrame
 	
 	public void addToWager(double money)
 	{
-//		double wager; 
+		double wager; 
+//		String delim = "$";
+//		String[] amount;
 		
 		//Get current wager & add 10
-		money += Double.parseDouble(wagerTxt.getText()) ;
-//				+ 10.00;
+		wager = Double.parseDouble(wagerTxt.getText()) 
+				+ money;
 		
 		//Set new Wager
-		wagerTxt.setText("" + money);
+		wagerTxt.setText("" + wager);
 	}
 	
 	/**
@@ -286,9 +317,6 @@ public class RacingGUI extends JFrame
 		
 		for(JButton item: betPanel2.getBetButtons())
 			allButtons.add(item);
-		
-		for(JButton item: allButtons)
-			System.out.println(item.getText());
 	}
 	
 	/**
@@ -299,7 +327,63 @@ public class RacingGUI extends JFrame
 	{
 		for(JButton item: buttons)
 			item.addActionListener(new ButtonListener());
-			
+	}
+	
+	/**
+	 * Starts playing music
+	 */
+	public void playMusic()
+	{
+		//Gets the resource from folder
+		URL url = RacingGUI.class.getResource("Never-Gonna-Give-You-Up.wav");
+		AudioClip clip = Applet.newAudioClip(url);
+		
+		//Plays the clip
+		clip.play();
+	}
+	
+	/**
+	 * Stops the music
+	 */
+	public void stopMusic()
+	{
+		//Gets the resource from folder
+		URL url = RacingGUI.class.getResource("Never-Gonna-Give-You-Up.wav");
+		AudioClip clip = Applet.newAudioClip(url);
+		
+		//Stops the clip
+		clip.stop();
+	}
+	
+	/**
+	 * Calculates the winner
+	 * 
+	 * @return The winner of the race
+	 */
+	public void calcWinner()
+	{
+		//Vars to hold 1/4 mile times of vehicles
+		double p1Time = player1.getVehicle().getTime();
+		double p2Time = player2.getVehicle().getTime();
+		
+		//To hold name of the winner
+		String winner = null;
+		
+		//Winner is calculated until someone DOES win
+		if (p1Time > p2Time)
+			winner = player1.getName();
+		else if (p2Time > p1Time)
+			winner = player2.getName();
+		else 
+			calcWinner();
+		
+		//Create new font for the label
+		Font font = new Font("Arial", Font.BOLD, 36);
+		
+		winnerLabel = new JLabel("The winner is " + winner, SwingConstants.CENTER);
+		
+		//Set font for winnerLabel
+		winnerLabel.setFont(font);
 	}
 	
 	public static void main(String[] args)

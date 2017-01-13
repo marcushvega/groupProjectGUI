@@ -30,7 +30,7 @@ public class Car
 		if (model.equalsIgnoreCase("Yugo"))
 			time = (Math.random() * 10) + 15;
 		else
-			time =( Math.random()*10) + 1;
+			time =( Math.random()*10) + 10;
 		return time;
 	}
 

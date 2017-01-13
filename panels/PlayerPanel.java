@@ -197,9 +197,9 @@ public class PlayerPanel extends JPanel
 	/**
 	 * @return the nameText
 	 */
-	public JTextField getNameText()
+	public String getNameText()
 	{
-		return nameText;
+		return nameText.getText();
 	}
 
 	/**
