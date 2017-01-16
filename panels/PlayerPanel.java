@@ -158,6 +158,11 @@ public class PlayerPanel extends JPanel
 		{
 			playerCar = new Car("Yugo", "45");
 		}
+		else
+		{
+			//If no car is chosen, player is assumed to be running
+			playerCar = new Car(getNameText(), "feet");
+		}
 		
 		//Set vehicle
 		player.setVehicle(playerCar);
@@ -195,7 +200,8 @@ public class PlayerPanel extends JPanel
 	}
 
 	/**
-	 * @return the nameText
+	 * @return the text from the nameText JTextField object 
+	 * 	
 	 */
 	public String getNameText()
 	{
@@ -205,19 +211,26 @@ public class PlayerPanel extends JPanel
 	/**
 	 * @param nameText the nameText to set
 	 */
-	public void setNameText(JTextField nameText)
+	public void setNameText(String name)
 	{
-		this.nameText = nameText;
+		nameText.setText(name);
 	}
 
 	/**
 	 * @param cashText the cashText to set
 	 */
-	public void setCashText(JTextField cashText)
+	public void setCashText(String cash)
 	{
-		this.cashText = cashText;
+		cashText.setText(cash);
 	}
-	
+
+	/**
+	 * @return the btnPanel
+	 */
+	public ButtonGroup getBtnGroup()
+	{
+		return bg;
+	}
 	
 
 }

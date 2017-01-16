@@ -10,13 +10,23 @@ import java.io.IOException;
 import java.net.*; //For URL and MalformedURLException classes
 						 //  For putting images / gif into panel
 import java.util.*;
+import java.util.List;
 import java.applet.*; //For music
+
+/**
+ * REMEMBER TO DO TITLE SCREEN
+ * @author ThinLlama
+ *
+ */
 
 public class RacingGUI extends JFrame
 {
+	private JPanel winnerPanel;		  //Reference winning message
+	
 	private JFrame fireworksFrame;	  //Reference Fireworks window
 	
 	private JLabel winnerLabel;		  //Reference Winner message
+	private JLabel winnerLabel2;		  //Reference part 2 of Winner message
 	
 	private Player player1;				  //Reference player 1
 	private Player player2;				  //Reference player 2
@@ -42,6 +52,8 @@ public class RacingGUI extends JFrame
 	private ArrayList<JButton> allButtons;	//Reference array to hold all buttons
 	
 	private JTextField wagerTxt;		  //Reference Text Field for wager
+	
+	private boolean theFight = false;  //Flags true if the players should fight		
 	
 	/**
 	 * Constructor
@@ -77,6 +89,9 @@ public class RacingGUI extends JFrame
 		//Pack the contents
 		pack();
 		
+		//Start playing music
+		playMusic("astley.wav");
+		
 		//Display the window
 		setVisible(true);
 
@@ -92,10 +107,6 @@ public class RacingGUI extends JFrame
 		raceButton = new JButton("RACE!!");
 		exitButton = new JButton("Exit (If You Are Scared)");
 		newGameButton = new JButton("New Race");
-		
-//		raceButton.addActionListener(new buttonListener());
-//		exitButton.addActionListener(new buttonListener());
-//		newGameButton.addActionListener(new buttonListener());
 
 		//Add buttonListeners to all buttons
 		//Put all the buttons into an ArrayList<JButton>
@@ -146,20 +157,21 @@ public class RacingGUI extends JFrame
 		// with 3 Rows and 1 Column
 		centerPanel = new JPanel(new GridLayout(3, 1));
 		
-		//Create the acceptWager button
+//		//Create the acceptWager button
 		// Also create blank filler panels
-		acceptWagerButton = new JButton("Accept Wager");
+//		acceptWagerButton = new JButton("Accept Wager");
 		JLabel filler1 = new JLabel(" ");
 //		JPanel filler2 = new JPanel();
 		
 		//Create wager text field
-		wagerTxt = new JTextField("0.00");
+		wagerTxt = new JTextField("0.00",7);
+		wagerTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		//Add wager button, wager text field, and fillers 
 		//   to CENTER panel
 		centerPanel.add(wagerTxt);
 		centerPanel.add(filler1);
-		centerPanel.add(acceptWagerButton);
+//		centerPanel.add(acceptWagerButton);
 		
 		//SOUTH PANEL add is in the buildButtonPanel() method
 		
@@ -171,7 +183,10 @@ public class RacingGUI extends JFrame
 		{
 			//RACE!! button is clicked
 			if (e.getSource() == raceButton)
-			{
+			{	
+				//Stop current music
+				stopMusic("astley.wav");
+				
 				playerPanel1.editNameText(false);
 				playerPanel2.editNameText(false);
 				
@@ -188,10 +203,7 @@ public class RacingGUI extends JFrame
 				player2.setName(playerPanel2.getNameText());
 				
 				theFireworks();
-				
-				//Start playing music
-//				playMusic();
-				
+
 			}
 			//EXIT button is clicked
 			else if (e.getSource() == exitButton)
@@ -205,12 +217,22 @@ public class RacingGUI extends JFrame
 				//Players, once again, are allowed to change their name
 				playerPanel1.editNameText(true);
 				playerPanel2.editNameText(true);
+				
+				//Car selection is reset
+				playerPanel1.getBtnGroup().clearSelection();
+				playerPanel2.getBtnGroup().clearSelection();
+				
+				//Starts music again
+				playMusic("astley.wav");
 			}
 			//Close button on fireworks screen is clicked
 			else if (e.getSource() == clFireworksButton)
 			{
 				//Remove window from view
 				fireworksFrame.setVisible(false);
+				
+				//Stop the fireworks sound
+				stopMusic("fireworks.wav");
 				
 				//Dispose window from memory
 				fireworksFrame.dispose();
@@ -236,17 +258,17 @@ public class RacingGUI extends JFrame
 				//Add $100.00 to the wager
 				addToWager(100);
 			}
+			else if (e.getSource() == betPanel1.getRejectButton()
+					|| e.getSource() == betPanel2.getRejectButton())
+			{
+				//Clear the bet
+				clearWager();
+			}
 		}
 	}
 	
 	public void theFireworks()
-	{
-		//Add GIF to the an object
-		ImageIcon icon = new ImageIcon("fireworks.gif");
-		JLabel fireworks = new JLabel(new ImageIcon("fireworks.gif"), JLabel.CENTER);
-		JLabel label1 = new JLabel();
-		fireworks.setIcon(icon);
-		
+	{	
 		//Create new window
 		fireworksFrame = new JFrame();
 
@@ -261,9 +283,9 @@ public class RacingGUI extends JFrame
 		calcWinner();
 		
 		//Add components to frame
-		fireworksFrame.add(fireworks, BorderLayout.CENTER);
+		//Center Panel is set during calcWinner()
 		fireworksFrame.add(clFireworksButton, BorderLayout.SOUTH);
-		fireworksFrame.add(winnerLabel, BorderLayout.NORTH);
+		fireworksFrame.add(winnerPanel, BorderLayout.NORTH);
 		
 	   fireworksFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	   fireworksFrame.pack();
@@ -274,6 +296,10 @@ public class RacingGUI extends JFrame
 	
 	}
 	
+	/**
+	 * Adds the bet to the wager
+	 * @param money
+	 */
 	public void addToWager(double money)
 	{
 		double wager; 
@@ -289,6 +315,14 @@ public class RacingGUI extends JFrame
 	}
 	
 	/**
+	 * Clears wager
+	 */
+	public void clearWager()
+	{
+		wagerTxt.setText("0.00");
+	}
+	
+	/**
 	 * Initialize allButtons ArrayList to 
 	 * contain ALL THE BUTTONS!!!*
 	 * 
@@ -297,8 +331,7 @@ public class RacingGUI extends JFrame
 	public void arrayListTheButtons()
 	{
 		allButtons = new ArrayList<JButton>(
-				Arrays.asList(raceButton, exitButton, newGameButton, 
-						acceptWagerButton));	
+				Arrays.asList(raceButton, exitButton, newGameButton));	
 		
 		//Add more buttons
 		addMoreButtons();
@@ -332,10 +365,10 @@ public class RacingGUI extends JFrame
 	/**
 	 * Starts playing music
 	 */
-	public void playMusic()
+	public void playMusic(String sound)
 	{
 		//Gets the resource from folder
-		URL url = RacingGUI.class.getResource("Never-Gonna-Give-You-Up.wav");
+		URL url = RacingGUI.class.getResource(sound);
 		AudioClip clip = Applet.newAudioClip(url);
 		
 		//Plays the clip
@@ -343,16 +376,17 @@ public class RacingGUI extends JFrame
 	}
 	
 	/**
-	 * Stops the music
+	 * Stops the music.
 	 */
-	public void stopMusic()
+	public void stopMusic(String sounds)
 	{
 		//Gets the resource from folder
-		URL url = RacingGUI.class.getResource("Never-Gonna-Give-You-Up.wav");
+		URL url = RacingGUI.class.getResource(sounds);
 		AudioClip clip = Applet.newAudioClip(url);
+			
+			//Stops the clip
+			clip.stop();
 		
-		//Stops the clip
-		clip.stop();
 	}
 	
 	/**
@@ -368,22 +402,123 @@ public class RacingGUI extends JFrame
 		
 		//To hold name of the winner
 		String winner = null;
+		//To hold the unfortunate event that occurred
+		String message = "le null";	//Kept getting error when var set to null
+		String message2 = null;
+		String message3 = null;
 		
 		//Winner is calculated until someone DOES win
 		if (p1Time > p2Time)
 			winner = player1.getName();
 		else if (p2Time > p1Time)
 			winner = player2.getName();
+		else if (p2Time == p1Time)
+			message = "tie";
+		
+		//A series of unfortunate events should someone race without a car
+		if (p1Time == -99 && p2Time == -99)
+		{
+			//Set messages
+			message = "Both players have rejected cars and have";
+			message2 = "decided to duke it out the old-fashioned way:";
+			message3 = "With their fists";
+			
+			//Create panel full of messages
+			winnerPanel = 
+					new MultiLabelPanel(
+							message, message2, message3).getPanel();
+
+			//Set image to cartoons fighting
+			setIcon("fight.gif");
+
+		}
+		else if (p1Time == -99)
+		{
+			//Play fireworks sounds
+			playMusic("fireworks.wav");
+			
+			message = player1.getName() + " decided to race without a car.";
+			
+			if (player1.getName().contains("man"))
+				message2 = player1.getName() + " miraculously won!";
+			else
+				message2 = player1.getName() + " lost, obviously.";
+			
+			//Create panel with message
+			winnerPanel = 
+					new MultiLabelPanel(message).getPanel();
+			
+			//Create panel full of messages
+			winnerPanel = 
+					new MultiLabelPanel(
+							message, message2).getPanel();
+			
+			//Set image to a fireworks gif
+			setIcon("fireworks.gif");
+	
+		}
+		else if (p2Time == -99)
+		{
+			message = player2.getName() + " was tragically attacked by a yeti";
+			message2 = "after attempting to race without a car";
+			
+			//Create panel full of messages
+			winnerPanel = 
+					new MultiLabelPanel(
+							message, message2).getPanel();
+			
+			//Set image to a yeti
+			setIcon("yeti.jpg");
+		}
+		//If both players chose cars
+		else if (message.equalsIgnoreCase("Tie"))
+		{
+			message = "There was a tie.";
+		}
+		else
+		{
+			message = "The winner is " + winner;
+			
+			//Create panel with message
+			winnerPanel = 
+					new MultiLabelPanel(message).getPanel();
+			
+			//Set icon to fireworks gif
+			setIcon("fireworks.gif");
+		}
+		
+		//Remove the wager amount from the loser's money
+		//Add the wager amount to the winner's money
+		//Set the TextFields as well
+		if (player1.getName() == winner)
+		{
+			//Set Player objects' cash fields
+			player1.setCash(Double.parseDouble(wagerTxt.getText()));
+			player2.setCash(-1 * Double.parseDouble(wagerTxt.getText()));
+		}
 		else 
-			calcWinner();
+		{
+			//Set Player objects' cash fields
+			player2.setCash(Double.parseDouble(wagerTxt.getText()));
+			player1.setCash(-1 * Double.parseDouble(wagerTxt.getText()));
+		}
 		
-		//Create new font for the label
-		Font font = new Font("Arial", Font.BOLD, 36);
-		
-		winnerLabel = new JLabel("The winner is " + winner, SwingConstants.CENTER);
-		
-		//Set font for winnerLabel
-		winnerLabel.setFont(font);
+		//Set TextField objects' text
+		playerPanel1.setCashText("" + player1.getCash());
+		playerPanel2.setCashText("" + player2.getCash());
+	}
+	
+	/**
+	 * Sets the icon at the end screen
+	 *   --The end screen is called fireworksFrame
+	 * @param outcome The outcome of the choices
+	 */
+	public void setIcon(String outcome)
+	{
+		ImageIcon fightIcon = new ImageIcon(outcome);
+		JLabel endRace = new JLabel(new ImageIcon(outcome), JLabel.CENTER);
+		endRace.setIcon(fightIcon);
+		fireworksFrame.add(endRace, BorderLayout.CENTER);
 	}
 	
 	public static void main(String[] args)

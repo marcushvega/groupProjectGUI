@@ -3,7 +3,7 @@ package classes;
 public class Player
 {
 	private String name;		//Name of the player
-	private int cash = 100;	//Cash the player has (Always starts at 100)
+	private double cash = 100;	//Cash the player has (Always starts at 100)
 	private Car vehicle;		//Vehicle the player has
 	
 	public void setName(String name)
@@ -16,12 +16,12 @@ public class Player
 		return name;
 	}
 	
-	public int getCash()
+	public double getCash()
 	{
 		return cash;
 	}
 	
-	public int addCash(int cash)
+	public double setCash(double cash)
 	{
 		this.cash += cash;
 		return this.cash;

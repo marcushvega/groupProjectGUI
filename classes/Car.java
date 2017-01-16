@@ -27,10 +27,13 @@ public class Car
 	}
 	public double getTime()
 	{
-		if (model.equalsIgnoreCase("Yugo"))
+		if (model.equalsIgnoreCase("45"))
 			time = (Math.random() * 10) + 15;
+		else if (model.equalsIgnoreCase("feet"))
+			time = -99;
 		else
 			time =( Math.random()*10) + 10;
+		
 		return time;
 	}
 
